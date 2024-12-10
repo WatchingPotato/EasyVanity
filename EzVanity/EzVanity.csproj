@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net46</TargetFramework>
+    <AssemblyName>EzVanity</AssemblyName>
+    <Product>EzVanity</Product>
+    <Version>0.1.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.samboy.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
+    <RootNamespace>EzVanity</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="UnityEngine.Modules" Version="2021.3.16" IncludeAssets="compile" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+   <!-- <Reference Include="0Harmony">
+      <HintPath>D:\Projects\Atlyss\AtlyssMods\EzVanity\lib\0Harmony.dll</HintPath> 
+    </Reference> -->
+    <Reference Include="Assembly-CSharp">
+      <HintPath>G:\SteamLibrary\steamapps\common\ATLYSS\ATLYSS_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+	  <!-- <Reference Include="BepInEx">
+      <HintPath>D:\Projects\Atlyss\AtlyssMods\EzVanity\lib\BepInEx.dll</HintPath>
+    </Reference> -->
+    <Reference Include="EasySettings">
+      <HintPath>D:\Projects\Atlyss\AtlyssMods\EzVanity\lib\EasySettings.dll</HintPath>
+    </Reference>
+	  <!-- <Reference Include="Mirror">
+      <HintPath>G:\SteamLibrary\steamapps\common\ATLYSS\ATLYSS_Data\Managed\Mirror.dll</HintPath>
+    </Reference> -->
+    <Reference Include="netstandard">
+      <HintPath>G:\SteamLibrary\steamapps\common\ATLYSS\ATLYSS_Data\Managed\netstandard.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>G:\SteamLibrary\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>G:\SteamLibrary\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>G:\SteamLibrary\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /q/y/i &quot;D:\Projects\Atlyss\AtlyssMods\EzVanity\obj\Debug\net46\EzVanity.dll&quot; &quot;%appdata%\com.kesomannen.gale\atlyss\profiles\Default\BepInEx\plugins\WatchingPotatoes-EasyVanity&quot; /E /H /C" />
+  </Target>
+</Project>
