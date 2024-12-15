@@ -23,7 +23,8 @@ namespace EzVanity
         private const string modName = "Easy Vanity";
         private const string modVersion = "1.0";
 
-        internal static new ManualLogSource Logger;
+        //private static ConfigEntry<KeyCode> ConfigMirrorKey;
+        //private static ConfigEntry<bool> ConfigEnableMirrorKey;
 
         private static ConfigEntry<bool> ConfigEnableFree;
         private static ConfigEntry<bool> ConfigEnableFreeTransmog;
@@ -34,7 +35,7 @@ namespace EzVanity
         {
             // Plugin startup logic
             Instance = this;
-            Logger = base.Logger;
+
             new Harmony(modName).PatchAll();
             Logger.LogInfo($"Plugin {modGUID} is loaded!");
 
@@ -61,7 +62,11 @@ namespace EzVanity
 
             //var MirrorKeyDefinition = new ConfigDefinition("Mirror Key", "ConfigMirrorKey");
             //var MirrorKeyDescription = new ConfigDescription("Set the Mirror Menu key");
-            //ConfigMirrorKey = Config.Bind(MirrorKeyDefinition, true, MirrorKeyDescription);
+            //ConfigMirrorKey = Config.Bind(MirrorKeyDefinition, KeyCode.M, MirrorKeyDescription);
+
+            //var EnableMirrorKeyDefinition = new ConfigDefinition("Enable Mirror Key", "EnableMirrorKey");
+            //var EnableMirrorKeyDescription = new ConfigDescription("Enable the Mirror Menu key");
+            //ConfigEnableMirrorKey = Config.Bind(EnableMirrorKeyDefinition, true, EnableMirrorKeyDescription);
         }
 
         //Config UI
@@ -74,8 +79,8 @@ namespace EzVanity
             tab.AddToggle("Free Transmog", ConfigEnableFreeTransmog);
             tab.AddToggle("Unlocked Transmog", ConfigEnableUnlockedTransmog);
 
-
-            // tab.AddButton("Mirror Menu Button", ConfigMirrorKey);
+            //tab.AddToggle("Enable Mirror Menu Button", ConfigEnableMirrorKey);
+            //tab.AddKeyButton("Mirror Menu Button", ConfigMirrorKey);
         }
 
         // Config bools
@@ -91,12 +96,24 @@ namespace EzVanity
         {
             return ConfigEnableUnlockedTransmog.Value;
         }
+        //private bool IsMirrorKeyEnabled()
+        //{
+        //    return ConfigEnableMirrorKey.Value;
+        //}
+
+
+
+        //
+
+        //Free Appearance Stuff
+
+        //
+
 
         // Sets appearnce cost to 0 and makes confirm button always interactable
         [HarmonyPatch(typeof(VanityMirrorManager), "Update")]
-        public class PatchVanityMirrorManagerUpdate
+        public class VanityMirrorManagerCostPatch
         {
-
             static void Postfix(VanityMirrorManager __instance)
             {
                 if (!Plugin.Instance.IsFreeAppearanceEnabled())
@@ -129,6 +146,14 @@ namespace EzVanity
             }
         }
 
+
+        //
+
+        //Free Transmog Stuff
+
+        //
+
+
         //Sets illusion stone count to always appear as 1 for tranmog
         [HarmonyPatch(typeof(PlayerEquipment), "<Init_TransmogItem>g__Retrieve_IllusionStoneCount|24_0")]
         public class PatchRetrieveIllusionStoneCount
@@ -144,17 +169,23 @@ namespace EzVanity
             }
         }
 
-        //Prevents illusion stones from being removed from inventory during transmog. I'm sure there are no unintented side effects /s
+        //Prevents illusion stones from being removed from inventory during transmog
         [HarmonyPatch(typeof(PlayerInventory), "Remove_Item")]
-        public class PatchRemoveItem
+        public class PatchRemoveIllusionStone
         {
-            static bool Prefix(PlayerEquipment __instance, ItemData _itemData, int _quantity)
+            static bool Prefix(PlayerInventory __instance, ItemData _itemData, int _quantity)
             {
                 if (!Plugin.Instance.IsFreeTransmogEnabled())
                 {
                     return true; // Exit if free transmog is not enabled
                 }
-                if (_itemData._itemName == "Illusion Stone" && _quantity > 0) // Prevent the removal of the item
+
+                if (TabMenu._current._itemCell._currentEquipCellTab != EquipCellTab.VANITY)
+                {
+                    return true; // Exit if the current tab is not vanity
+                }
+
+                if (_itemData._itemName == "Illusion Stone" && _quantity > 0) // Prevent the removal of Illusion Stones
                 {
                     return false;
                 }
@@ -162,17 +193,80 @@ namespace EzVanity
             }
         }
 
+
+        //
+
+        //Unlocked Transmog Stuff
+
+        //
+
+
+        //<Handle_ItemData>g__CanTransmogItem|40_7 is weird so things had to be done differently
+        private bool isNotWeaponOrRing;
+        private ScriptableEquipment currentScriptableEquipment;
+
+        public void CheckEquipmentType(ScriptableEquipment scriptableEquipment)
+        {
+            currentScriptableEquipment = scriptableEquipment;
+            isNotWeaponOrRing = !(scriptableEquipment.GetType() == typeof(ScriptableWeapon)) && !(scriptableEquipment.GetType() == typeof(ScriptableRing));
+        }
+
+        public bool IsNotWeaponOrRing()
+        {
+            //Debug.Log($"IsNotWeaponOrRing: {isNotWeaponOrRing}");
+            return isNotWeaponOrRing;
+        }
+
+        [HarmonyPatch(typeof(ItemListDataEntry), "<Handle_ItemData>g__CanTransmogItem|40_7")]
+        public class PatchCanTransmogItem
+        {
+            static bool Prefix(ItemListDataEntry __instance, ref bool __result)
+            {
+                if (!Plugin.Instance.IsUnlockedTransmogEnabled())
+                {
+                    return true; // Exit if unlocked transmog is not enabled
+                }
+
+                if (__instance._scriptableItem._itemType == ItemType.GEAR)
+                {
+                    ScriptableEquipment scriptableEquipment = (ScriptableEquipment)__instance._scriptableItem;
+                    Plugin.Instance.CheckEquipmentType(scriptableEquipment);
+
+                    if (Plugin.Instance.IsNotWeaponOrRing())
+                    {
+                        __result = true;
+                        return false;
+                    }
+                }
+
+                __result = false;
+                return false;
+            }
+        }
+
+
         //Makes it so you can always transmog equipment
         [HarmonyPatch(typeof(ItemMenuCell), "AbleToTransmogEquip")]
         public class PatchAbleToTransmogEquip
         {
-            static void Postfix(ref bool __result)
+            static void Postfix(ItemMenuCell __instance, ItemListDataEntry _listEntry, ref bool __result)
             {
                 if (!Plugin.Instance.IsUnlockedTransmogEnabled())
                 {
                     return; // Exit if unlocked transmog is not enabled
                 }
-                __result = true;
+
+                if (_listEntry._scriptableItem._itemType == ItemType.GEAR)
+                {
+                    ScriptableEquipment scriptableEquipment = (ScriptableEquipment)_listEntry._scriptableItem;
+                    Plugin.Instance.CheckEquipmentType(scriptableEquipment);
+
+                    if (Plugin.Instance.IsNotWeaponOrRing())
+                    {
+                        __result = true;
+                        return;
+                    }
+                }
             }
         }
     }
