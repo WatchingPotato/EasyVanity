@@ -11,9 +11,7 @@ This mod does 3 things
 these can be enable or disabled at will
 
 ## Known/Potential Issue
-- When unlocked or free transmogrifying is enabled, items that can be used will still be greyed out.
 - I have not tested it in multiplayer so idk if it works. (if you do end up testing it, feel free to tell me if it worked)
 
 ## TODO
 - add hotkey to open appearance menu
-- fix greyed out issue
