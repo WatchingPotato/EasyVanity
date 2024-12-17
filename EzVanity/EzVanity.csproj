@@ -56,6 +56,6 @@
   </ItemGroup>
   
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /q/y/i &quot;D:\Projects\Atlyss\AtlyssMods\EzVanity\obj\Debug\net46\EzVanity.dll&quot; &quot;%appdata%\com.kesomannen.gale\atlyss\profiles\Default\BepInEx\plugins\WatchingPotatoes-EasyVanity&quot; /E /H /C" />
+    <Exec Command="xcopy /q/y/i &quot;D:\Projects\Atlyss\AtlyssMods\EzVanity\obj\Debug\net46\EzVanity.dll&quot; &quot;%appdata%\com.kesomannen.gale\atlyss\profiles\Atlyss - BepinEX\BepInEx\plugins\WatchingPotatoes-EasyVanity&quot; /E /H /C" />
   </Target>
 </Project>

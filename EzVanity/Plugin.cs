@@ -102,7 +102,6 @@ namespace EzVanity
         //}
 
 
-
         //
 
         //Free Appearance Stuff
@@ -155,7 +154,7 @@ namespace EzVanity
 
 
         //Sets illusion stone count to always appear as 1 for tranmog
-        [HarmonyPatch(typeof(PlayerEquipment), "<Init_TransmogItem>g__Retrieve_IllusionStoneCount|24_0")]
+        [HarmonyPatch(typeof(PlayerEquipment), "<Init_TransmogItem>g__Retrieve_IllusionStoneCount|22_0")]
         public class PatchRetrieveIllusionStoneCount
         {
             static bool Prefix(ref int __result)
@@ -217,7 +216,7 @@ namespace EzVanity
             return isNotWeaponOrRing;
         }
 
-        [HarmonyPatch(typeof(ItemListDataEntry), "<Handle_ItemData>g__CanTransmogItem|40_7")]
+        [HarmonyPatch(typeof(ItemListDataEntry), "CanTransmogItem")]
         public class PatchCanTransmogItem
         {
             static bool Prefix(ItemListDataEntry __instance, ref bool __result)
