@@ -9,9 +9,3 @@ This mod does 3 things
 - Removes the level and class limit for transmogrifying
 
 these can be enable or disabled at will
-
-## Known/Potential Issue
-- I have not tested it in multiplayer so idk if it works. (if you do end up testing it, feel free to tell me if it worked)
-
-## TODO
-- add hotkey to open appearance menu
