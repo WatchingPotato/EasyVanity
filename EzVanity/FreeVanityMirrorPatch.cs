@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System.Diagnostics;
 using System.Reflection;
 using UnityEngine.UI;
 
@@ -6,38 +7,39 @@ namespace EzVanity
 {
     class FreeVanityMirrorPatch
     {
-        [HarmonyPatch(typeof(VanityMirrorManager), "Update")]
-        public class VanityMirrorManagerCostPatch
+        [HarmonyPatch(typeof(VanityMirrorManager), "<Update>g__Retrieve_IllusionStoneCount|57_0")]
+        public class PatchRetrieveIllusionStoneCount
         {
-            static void Postfix(VanityMirrorManager __instance)
+            static bool Prefix(ref int __result)
             {
                 if (!Plugin.Instance.IsFreeAppearanceEnabled())
                 {
-                    return;
+                    return true;
                 }
-
-                FieldInfo costField = typeof(VanityMirrorManager).GetField("_currentAppearanceCost", BindingFlags.NonPublic | BindingFlags.Instance);
-                FieldInfo counterField = typeof(VanityMirrorManager).GetField("_appearanceCostCounter", BindingFlags.NonPublic | BindingFlags.Instance);
-                FieldInfo buttonField = typeof(VanityMirrorManager).GetField("_applyAppearanceButton", BindingFlags.NonPublic | BindingFlags.Instance);
-
-                if (costField != null && counterField != null && buttonField != null)
+                __result = 1;
+                return false;
+            }
+        }
+        [HarmonyPatch(typeof(PlayerInventory), "Remove_Item")]
+        public class PatchRemoveIllusionStone
+        {
+            static bool Prefix(PlayerInventory __instance, ItemData _itemData, int _quantity)
+            {
+                if (!Plugin.Instance.IsFreeAppearanceEnabled())
                 {
-                    costField.SetValue(__instance, 0);
-
-                    // Update the appearance cost counter - unsure if still needed
-                    var counter = counterField.GetValue(__instance) as Text;
-                    if (counter != null)
-                    {
-                        counter.text = string.Format("Cost: x{0}", 0);
-                    }
-
-                    // Makes confirm button always interactable
-                    var applyButton = buttonField.GetValue(__instance) as UnityEngine.UI.Button;
-                    if (applyButton != null)
-                    {
-                        applyButton.interactable = true;
-                    }
+                    return true;
                 }
+
+                if (!VanityMirrorManager._current._isOpen)
+                {
+                    return true;
+                }
+
+                if (_itemData._itemName == "Illusion Stone" && _quantity > 0)
+                {
+                    return false;
+                }
+                return true;
             }
         }
     }

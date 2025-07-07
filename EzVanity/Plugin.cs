@@ -21,7 +21,7 @@ namespace EzVanity
     {
         private const string modGUID = "ez.vanity";
         private const string modName = "Easy Vanity";
-        private const string modVersion = "1.1.6";
+        private const string modVersion = "1.1.7";
 
         private static ConfigEntry<bool> ConfigEnableFree;
         private static ConfigEntry<bool> ConfigEnableFreeTransmog;
@@ -37,42 +37,42 @@ namespace EzVanity
             Logger.LogInfo($"Plugin {modGUID} is loaded!");
 
             // temp manual configs
-            //ConfigEnableFree = Config.Bind("Free Appearance Change", "EnableFreeAppearance", true,"Whether or not it is free to make changes at the mirror");
-            //ConfigEnableFreeTransmog = Config.Bind("Free Transmog", "EnableFreeTransmog", true, "Whether or not it is free to transmog armor");
-            //ConfigEnableUnlockedTransmog = Config.Bind("Unlocked Transmog", "EnableUnlockedTransmog", true, "Whether or not Transmog is unrestricted");
+            ConfigEnableFree = Config.Bind("Free Appearance Change", "EnableFreeAppearance", true, "Whether or not it is free to make changes at the mirror");
+            ConfigEnableFreeTransmog = Config.Bind("Free Transmog", "EnableFreeTransmog", true, "Whether or not it is free to transmog armor");
+            ConfigEnableUnlockedTransmog = Config.Bind("Unlocked Transmog", "EnableUnlockedTransmog", true, "Whether or not Transmog is unrestricted");
 
             //EasySettings Init
-            InitConfig();
-            Settings.OnInitialized.AddListener(AddSettings);
-            Settings.OnApplySettings.AddListener(() => { Config.Save(); });
+            //InitConfig();
+            //Settings.OnInitialized.AddListener(AddSettings);
+            //Settings.OnApplySettings.AddListener(() => { Config.Save(); });
         }
 
         //EasySettings Config Init
-        private void InitConfig()
-        {
-            var FreeAppearanceDefinition = new ConfigDefinition("Free Appearance Change", "EnableFreeAppearance");
-            var FreeAppearanceDescription = new ConfigDescription("Enable or disable changing appearance for free.");
-            ConfigEnableFree = Config.Bind(FreeAppearanceDefinition, true, FreeAppearanceDescription);
+        //private void InitConfig()
+        //{
+        //    var FreeAppearanceDefinition = new ConfigDefinition("Free Appearance Change", "EnableFreeAppearance");
+        //    var FreeAppearanceDescription = new ConfigDescription("Enable or disable changing appearance for free.");
+        //    ConfigEnableFree = Config.Bind(FreeAppearanceDefinition, true, FreeAppearanceDescription);
 
-            var FreeTransmogDefinition = new ConfigDefinition("Free Transmog", "EnableFreeTransmog");
-            var FreeTransmogDescription = new ConfigDescription("Enable or disable transmogging for free.");
-            ConfigEnableFreeTransmog = Config.Bind(FreeTransmogDefinition, true, FreeTransmogDescription);
+        //    var FreeTransmogDefinition = new ConfigDefinition("Free Transmog", "EnableFreeTransmog");
+        //    var FreeTransmogDescription = new ConfigDescription("Enable or disable transmogging for free.");
+        //    ConfigEnableFreeTransmog = Config.Bind(FreeTransmogDefinition, true, FreeTransmogDescription);
 
-            var UnlockedTransmogDefinition = new ConfigDefinition("Unlocked Transmog", "EnableUnlockedTransmog");
-            var UnlockedTransmogDescription = new ConfigDescription("Enable or disable transmogging for free.");
-            ConfigEnableUnlockedTransmog = Config.Bind(UnlockedTransmogDefinition, true, UnlockedTransmogDescription);
-        }
+        //    var UnlockedTransmogDefinition = new ConfigDefinition("Unlocked Transmog", "EnableUnlockedTransmog");
+        //    var UnlockedTransmogDescription = new ConfigDescription("Enable or disable transmogging for free.");
+        //    ConfigEnableUnlockedTransmog = Config.Bind(UnlockedTransmogDefinition, true, UnlockedTransmogDescription);
+        //}
 
-        //Config UI
-        private void AddSettings()
-        {
-            SettingsTab tab = Settings.ModTab;
+        //EasySettings Config UI
+        //private void AddSettings()
+        //{
+        //    SettingsTab tab = Settings.ModTab;
 
-            tab.AddHeader("Easy Vanity");
-            tab.AddToggle("Free Appearance Changes", ConfigEnableFree);
-            tab.AddToggle("Free Transmog", ConfigEnableFreeTransmog);
-            tab.AddToggle("Unlocked Transmog", ConfigEnableUnlockedTransmog);
-        }
+        //    tab.AddHeader("Easy Vanity");
+        //    tab.AddToggle("Free Appearance Changes", ConfigEnableFree);
+        //    tab.AddToggle("Free Transmog", ConfigEnableFreeTransmog);
+        //    tab.AddToggle("Unlocked Transmog", ConfigEnableUnlockedTransmog);
+        //}
 
         // Config bools
         public bool IsFreeAppearanceEnabled()

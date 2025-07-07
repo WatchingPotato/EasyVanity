@@ -30,7 +30,7 @@ namespace EzVanity
                     return true;
                 }
 
-                if (TabMenu._current._itemCell._currentEquipCellTab != EquipCellTab.VANITY)
+                if (TabMenu._current._itemCell._currentEquipCellTab != EquipCellTab.VANITY_PANEL)
                 {
                     return true;
                 }
