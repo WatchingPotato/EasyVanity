@@ -21,11 +21,12 @@ namespace EzVanity
     {
         private const string modGUID = "ez.vanity";
         private const string modName = "Easy Vanity";
-        private const string modVersion = "1.1.9";
+        private const string modVersion = "1.2.0";
 
         private static ConfigEntry<bool> ConfigEnableFree;
         private static ConfigEntry<bool> ConfigEnableFreeTransmog;
         private static ConfigEntry<bool> ConfigEnableUnlockedTransmog;
+        private static ConfigEntry<bool> ConfigEnableDontConsumeDye;
 
         public static Plugin Instance { get; private set; }
         private void Awake()
@@ -36,10 +37,11 @@ namespace EzVanity
             new Harmony(modName).PatchAll();
             Logger.LogInfo($"Plugin {modGUID} is loaded!");
 
-            //// Temp manual configs
+            // Temp manual configs
             //ConfigEnableFree = Config.Bind("Free Appearance Change", "EnableFreeAppearance", true, "Whether or not it is free to make changes at the mirror");
             //ConfigEnableFreeTransmog = Config.Bind("Free Transmog", "EnableFreeTransmog", true, "Whether or not it is free to transmog armor");
-            //ConfigEnableUnlockedTransmog = Config.Bind("Unlocked Transmog", "EnableUnlockedTransmog", true, "Whether or not Transmog is unrestricted");
+            //ConfigEnableUnlockedTransmog = Config.Bind("Unlocked Transmog", "EnableUnlockedTransmog", true, "Whether or not transmog is unrestricted");
+            //ConfigEnableDontConsumeDye = Config.Bind("Dont Consume Dye", "DontConsumeDye", true, "Whether or not consume dye when used");
 
             //EasySettings Init
             InitConfig();
@@ -47,7 +49,7 @@ namespace EzVanity
             Settings.OnApplySettings.AddListener(() => { Config.Save(); });
         }
 
-        //EasySettings Config Init
+        // EasySettings Config Init
         private void InitConfig()
         {
             var FreeAppearanceDefinition = new ConfigDefinition("Free Appearance Change", "EnableFreeAppearance");
@@ -61,9 +63,13 @@ namespace EzVanity
             var UnlockedTransmogDefinition = new ConfigDefinition("Unlocked Transmog", "EnableUnlockedTransmog");
             var UnlockedTransmogDescription = new ConfigDescription("Enable or disable transmogging for free.");
             ConfigEnableUnlockedTransmog = Config.Bind(UnlockedTransmogDefinition, true, UnlockedTransmogDescription);
+
+            var DontConsumeDyeDef = new ConfigDefinition("Dont Consume Dye", "EnableDontConsumeDye");
+            var DontConsumeDyeDes = new ConfigDescription("Whether dye is consume when used.");
+            ConfigEnableDontConsumeDye = Config.Bind(DontConsumeDyeDef, true, DontConsumeDyeDes);
         }
 
-        //EasySettings Config UI
+        // EasySettings Config UI
         private void AddSettings()
         {
             SettingsTab tab = Settings.ModTab;
@@ -72,6 +78,7 @@ namespace EzVanity
             tab.AddToggle("Free Appearance Changes", ConfigEnableFree);
             tab.AddToggle("Free Transmog", ConfigEnableFreeTransmog);
             tab.AddToggle("Unlocked Transmog", ConfigEnableUnlockedTransmog);
+            tab.AddToggle("Dont Consume Dye", ConfigEnableDontConsumeDye);
         }
 
         // Config bools
@@ -87,7 +94,10 @@ namespace EzVanity
         {
             return ConfigEnableUnlockedTransmog.Value;
         }
-
+        public bool DontConsumeDyeEnabled()
+        {
+            return ConfigEnableDontConsumeDye.Value;
+        }
     }
 }
 

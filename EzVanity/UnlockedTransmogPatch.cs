@@ -20,7 +20,7 @@ namespace EzVanity
 
         public bool IsNotWeaponOrRing()
         {
-            // Debug.Log($"IsNotWeaponOrRing: {isNotWeaponOrRing}");
+            //Debug.Log($"IsNotWeaponOrRing: {isNotWeaponOrRing}");
             return isNotWeaponOrRing;
         }
 
