@@ -21,7 +21,7 @@ namespace EzVanity
     {
         private const string modGUID = "ez.vanity";
         private const string modName = "Easy Vanity";
-        private const string modVersion = "1.2.0";
+        private const string modVersion = "1.2.2";
 
         private static ConfigEntry<bool> ConfigEnableFree;
         private static ConfigEntry<bool> ConfigEnableFreeTransmog;
