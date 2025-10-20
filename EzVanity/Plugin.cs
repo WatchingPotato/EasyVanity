@@ -1,15 +1,9 @@
 ﻿using BepInEx;
+using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
-using System;
-using System.CodeDom;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Nessie.ATLYSS.EasySettings;
@@ -21,14 +15,15 @@ namespace EzVanity
     {
         private const string modGUID = "ez.vanity";
         private const string modName = "Easy Vanity";
-        private const string modVersion = "1.2.2";
+        private const string modVersion = "1.2.3";
 
         private static ConfigEntry<bool> ConfigEnableFree;
         private static ConfigEntry<bool> ConfigEnableFreeTransmog;
         private static ConfigEntry<bool> ConfigEnableUnlockedTransmog;
-        private static ConfigEntry<bool> ConfigEnableDontConsumeDye;
+        //private static ConfigEntry<bool> ConfigEnableDontConsumeDye;
 
         public static Plugin Instance { get; private set; }
+
         private void Awake()
         {
             // Plugin startup logic
@@ -49,6 +44,7 @@ namespace EzVanity
             Settings.OnApplySettings.AddListener(() => { Config.Save(); });
         }
 
+
         // EasySettings Config Init
         private void InitConfig()
         {
@@ -64,9 +60,9 @@ namespace EzVanity
             var UnlockedTransmogDescription = new ConfigDescription("Enable or disable transmogging for free.");
             ConfigEnableUnlockedTransmog = Config.Bind(UnlockedTransmogDefinition, true, UnlockedTransmogDescription);
 
-            var DontConsumeDyeDef = new ConfigDefinition("Dont Consume Dye", "EnableDontConsumeDye");
-            var DontConsumeDyeDes = new ConfigDescription("Whether dye is consume when used.");
-            ConfigEnableDontConsumeDye = Config.Bind(DontConsumeDyeDef, true, DontConsumeDyeDes);
+            //var DontConsumeDyeDef = new ConfigDefinition("Dont Consume Dye", "EnableDontConsumeDye");
+            //var DontConsumeDyeDes = new ConfigDescription("Whether dye is consume when used.");
+            //ConfigEnableDontConsumeDye = Config.Bind(DontConsumeDyeDef, false, DontConsumeDyeDes);
         }
 
         // EasySettings Config UI
@@ -78,7 +74,7 @@ namespace EzVanity
             tab.AddToggle("Free Appearance Changes", ConfigEnableFree);
             tab.AddToggle("Free Transmog", ConfigEnableFreeTransmog);
             tab.AddToggle("Unlocked Transmog", ConfigEnableUnlockedTransmog);
-            tab.AddToggle("Dont Consume Dye", ConfigEnableDontConsumeDye);
+           //tab.AddToggle("Dont Consume Dye", ConfigEnableDontConsumeDye);
         }
 
         // Config bools
@@ -94,10 +90,10 @@ namespace EzVanity
         {
             return ConfigEnableUnlockedTransmog.Value;
         }
-        public bool DontConsumeDyeEnabled()
-        {
-            return ConfigEnableDontConsumeDye.Value;
-        }
+        //public bool DontConsumeDyeEnabled()
+        //{
+        //    return ConfigEnableDontConsumeDye.Value;
+        //} 
     }
 }
 
