@@ -4,7 +4,7 @@ namespace EzVanity
 {
     class FreeTransmogPatch
     {
-        //Sets illusion stone count to always appear as 1 for tranmog
+        //Sets illusion stone count to always appear as 1 for transmog
         [HarmonyPatch(typeof(PlayerEquipment), "<Init_TransmogItem>g__Retrieve_IllusionStoneCount|23_0")]
         public class PatchRetrieveIllusionStoneCount
         {
@@ -25,16 +25,10 @@ namespace EzVanity
         {
             static bool Prefix(PlayerInventory __instance, ItemData _itemData, int _quantity)
             {
-                if (!Plugin.Instance.IsFreeTransmogEnabled())
+                if (!Plugin.Instance.IsFreeTransmogEnabled() || TabMenu._current._itemCell._currentEquipCellTab != EquipCellTab.VANITY_PANEL)
                 {
                     return true;
                 }
-
-                if (TabMenu._current._itemCell._currentEquipCellTab != EquipCellTab.VANITY_PANEL)
-                {
-                    return true;
-                }
-
                 if (_itemData._itemName == "Illusion Stone" && _quantity > 0)
                 {
                     return false;

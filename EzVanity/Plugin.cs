@@ -6,75 +6,65 @@ using HarmonyLib;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using Nessie.ATLYSS.EasySettings;
 
 namespace EzVanity
 {
     [BepInPlugin(modGUID, modName, modVersion)]
+    [BepInDependency("EasySettings", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("Homebrewery", BepInDependency.DependencyFlags.SoftDependency)]
     public class Plugin : BaseUnityPlugin
     {
         private const string modGUID = "ez.vanity";
         private const string modName = "Easy Vanity";
-        private const string modVersion = "1.2.3";
+        private const string modVersion = "1.2.5";
 
-        private static ConfigEntry<bool> ConfigEnableFree;
-        private static ConfigEntry<bool> ConfigEnableFreeTransmog;
-        private static ConfigEntry<bool> ConfigEnableUnlockedTransmog;
-        //private static ConfigEntry<bool> ConfigEnableDontConsumeDye;
+        public static ConfigEntry<bool> ConfigEnableFree;
+        public static ConfigEntry<bool> ConfigEnableFreeTransmog;
+        public static ConfigEntry<bool> ConfigEnableUnlockedTransmog;
+        public static ConfigEntry<bool> ConfigEnableDontConsumeDye;
 
+        public static bool HBloaded = false;
         public static Plugin Instance { get; private set; }
 
         private void Awake()
         {
             // Plugin startup logic
+            var harmony = new Harmony("ez.vanity");
             Instance = this;
-
-            new Harmony(modName).PatchAll();
             Logger.LogInfo($"Plugin {modGUID} is loaded!");
+            //new Harmony(modName).PatchAll();
 
-            // Temp manual configs
-            //ConfigEnableFree = Config.Bind("Free Appearance Change", "EnableFreeAppearance", true, "Whether or not it is free to make changes at the mirror");
-            //ConfigEnableFreeTransmog = Config.Bind("Free Transmog", "EnableFreeTransmog", true, "Whether or not it is free to transmog armor");
-            //ConfigEnableUnlockedTransmog = Config.Bind("Unlocked Transmog", "EnableUnlockedTransmog", true, "Whether or not transmog is unrestricted");
-            //ConfigEnableDontConsumeDye = Config.Bind("Dont Consume Dye", "DontConsumeDye", true, "Whether or not consume dye when used");
+            // Theres probably a better way to do this, but fuck it we ball
+            harmony.PatchAll(typeof(FreeTransmogPatch.PatchRemoveIllusionStone));
+            harmony.PatchAll(typeof(FreeTransmogPatch.PatchRetrieveIllusionStoneCount));
+            harmony.PatchAll(typeof(FreeVanityMirrorPatch.PatchRemoveIllusionStone));
+            harmony.PatchAll(typeof(FreeVanityMirrorPatch.PatchRetrieveIllusionStoneCount));
+            harmony.PatchAll(typeof(UnlockedTransmogPatch.PatchAbleToTransmogEquip));
+            harmony.PatchAll(typeof(UnlockedTransmogPatch.PatchCanTransmogItem));
 
-            //EasySettings Init
-            InitConfig();
-            Settings.OnInitialized.AddListener(AddSettings);
-            Settings.OnApplySettings.AddListener(() => { Config.Save(); });
-        }
+            ConfigEnableFree = Config.Bind("Free Appearance Change", "EnableFreeAppearance", true, "Whether or not it is free to make changes at the mirror");
+            ConfigEnableFreeTransmog = Config.Bind("Free Transmog", "EnableFreeTransmog", true, "Whether or not it is free to transmog armor");
+            ConfigEnableUnlockedTransmog = Config.Bind("Unlocked Transmog", "EnableUnlockedTransmog", true, "Whether or not transmog is unrestricted");
+            ConfigEnableDontConsumeDye = Config.Bind("Dont Consume Dye", "DontConsumeDye", true, "Whether or not consume dye when used (Not HB Compatiable)");
 
+            // ES check
+            if (BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("EasySettings"))
+            {
+                Logger.LogInfo("EasySettings found - Settings tab added");
+                ESsetup.Initialize();
+            }
 
-        // EasySettings Config Init
-        private void InitConfig()
-        {
-            var FreeAppearanceDefinition = new ConfigDefinition("Free Appearance Change", "EnableFreeAppearance");
-            var FreeAppearanceDescription = new ConfigDescription("Enable or disable changing appearance for free.");
-            ConfigEnableFree = Config.Bind(FreeAppearanceDefinition, true, FreeAppearanceDescription);
-
-            var FreeTransmogDefinition = new ConfigDefinition("Free Transmog", "EnableFreeTransmog");
-            var FreeTransmogDescription = new ConfigDescription("Enable or disable transmogging for free.");
-            ConfigEnableFreeTransmog = Config.Bind(FreeTransmogDefinition, true, FreeTransmogDescription);
-
-            var UnlockedTransmogDefinition = new ConfigDefinition("Unlocked Transmog", "EnableUnlockedTransmog");
-            var UnlockedTransmogDescription = new ConfigDescription("Enable or disable transmogging for free.");
-            ConfigEnableUnlockedTransmog = Config.Bind(UnlockedTransmogDefinition, true, UnlockedTransmogDescription);
-
-            //var DontConsumeDyeDef = new ConfigDefinition("Dont Consume Dye", "EnableDontConsumeDye");
-            //var DontConsumeDyeDes = new ConfigDescription("Whether dye is consume when used.");
-            //ConfigEnableDontConsumeDye = Config.Bind(DontConsumeDyeDef, false, DontConsumeDyeDes);
-        }
-
-        // EasySettings Config UI
-        private void AddSettings()
-        {
-            SettingsTab tab = Settings.ModTab;
-
-            tab.AddHeader("Easy Vanity");
-            tab.AddToggle("Free Appearance Changes", ConfigEnableFree);
-            tab.AddToggle("Free Transmog", ConfigEnableFreeTransmog);
-            tab.AddToggle("Unlocked Transmog", ConfigEnableUnlockedTransmog);
-           //tab.AddToggle("Dont Consume Dye", ConfigEnableDontConsumeDye);
+            // HB check
+            if (BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("Homebrewery"))
+            {
+                Logger.LogInfo("Homebrewery found - Skipping dye patch");
+                HBloaded = true;
+            }
+            else
+            {
+                harmony.PatchAll(typeof(DyePatch.PatchRemoveDye));
+            }
+            
         }
 
         // Config bools
@@ -90,10 +80,10 @@ namespace EzVanity
         {
             return ConfigEnableUnlockedTransmog.Value;
         }
-        //public bool DontConsumeDyeEnabled()
-        //{
-        //    return ConfigEnableDontConsumeDye.Value;
-        //} 
+        public bool DontConsumeDyeEnabled()
+        {
+            return ConfigEnableDontConsumeDye.Value;
+        }
     }
 }
 

@@ -45,7 +45,6 @@ namespace EzVanity
                         return false;
                     }
                 }
-
                 __result = false;
                 return false;
             }
